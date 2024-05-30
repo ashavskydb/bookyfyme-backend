@@ -1,5 +1,5 @@
-import { Model, DataTypes } from 'sequelize';
-import { sequelize } from '../sequelize';
+import { DataTypes, Model } from 'sequelize';
+import { sequelize } from '../database/db';
 
 class User extends Model {
   public id!: number;

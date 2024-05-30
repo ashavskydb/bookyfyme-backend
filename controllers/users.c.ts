@@ -14,7 +14,7 @@ export const registerUser = async (req: Request, res: Response) => {
     if (error instanceof Error) {
       res.status(500).json({ error: error.message });
     } else {
-      res.status(500).json({ error: 'Unknown error' });
+        res.status(500).json({ error: 'Unknown error' });
     }
   }
 };
