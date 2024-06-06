@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { Accommodation } from '../../models/Accommodation';
 
 const API_KEY = 'c2ff5dcfd254658cd22d35f43e06fa89a42a7396ce96588aaab08c60f01cc82f'; 
 const GOOGLE_HOTELS_API_URL = 'https://serpapi.com/search';

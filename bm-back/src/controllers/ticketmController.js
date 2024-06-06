@@ -1,4 +1,4 @@
-import { Ticketm } from './models/Ticketm.js';
+import { Ticketm } from '../models/BandsinTown.js';
 
 export const findEvents = async (req, res) => {
   try {
