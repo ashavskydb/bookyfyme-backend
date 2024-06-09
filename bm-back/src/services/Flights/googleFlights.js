@@ -1,5 +1,5 @@
-const axios = require('axios');
-const { Trip } = require('./models/Trip'); 
+import axios from 'axios';
+import { Trip } from '../../models/Flight.js';
 
 async function fetchFlightData() {
   const API_KEY = "AIzaSyAEUOrTX1RtMJ9vVgqgevhRlGyIYrNw2DA";
@@ -41,4 +41,4 @@ async function addFlightToCalendar(trip) {
   console.log(`Event added to calendar: Flight to ${trip.destination} from ${trip.startDate.toISOString()} to ${trip.endDate.toISOString()}`);
 }
 
-bookFlightAndCreateTrip();
+export { bookFlightAndCreateTrip };

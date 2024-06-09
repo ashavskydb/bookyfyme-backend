@@ -1,7 +1,7 @@
-const axios = require('axios');
-const readline = require('readline');
-const { Ticketm } = require('./models/BandsinTown'); 
-const { sequelize } = require('./database/db'); 
+import axios from 'axios';
+import readline from 'readline';
+import { Bandsintown } from '../../models/Bandsintown.js';
+import { sequelize } from '../../database/db.js';    
 
 async function httpGetAsync(url) {
     try {
@@ -29,8 +29,8 @@ async function parseEvent(artist, region) {
                 console.log(`Event ${j}`);
                 console.log('---');
 
-               
-                await Ticketm.create({
+                
+                await Bandsintown.create({
                     name: data[j].artists[0].name,
                     city: data[j].venue.city,
                     date: data[j].datetime.split('T')[0], 
@@ -115,5 +115,6 @@ async function startFetchingEvents(region) {
     }
 }
 
+promptUserForRegion(); 
 
-promptUserForRegion();
+export { parseEvent };

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getTrips, createTrip, updateTrip, deleteTrip } from '../controllers/tripController.js';
+import { getTrips, createTrip, updateTrip, deleteTrip } from '../controllers/flightController.js';
 
 const tripRouter = Router();
 

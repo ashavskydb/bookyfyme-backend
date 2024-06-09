@@ -4,6 +4,7 @@ dotenv.config();
 export const config = {
   database: process.env.PGDATABASE,
   jwtSecret: process.env.JWT_SECRET,
+  dialect: 'postgres',
   useSSL: process.env.USE_SSL === 'true',
   sslRequired: true, 
   rejectUnauthorized: process.env.REJECT_UNAUTHORIZED !== 'false',
@@ -15,3 +16,5 @@ export const config = {
   googleHotelsClientId: process.env.GOOGLE_HOTELS_CLIENT_ID,
   googleHotelsClientSecret: process.env.GOOGLE_HOTELS_CLIENT_SECRET
 };
+
+export default config;

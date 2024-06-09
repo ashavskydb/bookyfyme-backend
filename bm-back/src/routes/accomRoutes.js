@@ -1,5 +1,5 @@
 import express from 'express';
-import * as accomController from './controllers/accomController.js';
+import * as accomController from '../controllers/accomController.js';
 
 const router = express.Router();
 
