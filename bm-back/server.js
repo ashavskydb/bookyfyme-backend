@@ -44,8 +44,6 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
     logging: config.logging
 });
 
-const calendars = [];
-
 app.post('/api/create-calendar', (req, res) => {
     try {
         const { calendarName } = req.body;
