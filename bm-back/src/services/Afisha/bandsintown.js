@@ -29,7 +29,6 @@ async function parseEvent(artist, region) {
                 console.log(`Event ${j}`);
                 console.log('---');
 
-                
                 await Bandsintown.create({
                     name: data[j].artists[0].name,
                     city: data[j].venue.city,
