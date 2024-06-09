@@ -21,4 +21,8 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.get('/', (req, res) => {
+  res.send('Auth API is working');
+});
+
 export default router;

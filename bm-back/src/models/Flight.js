@@ -1,8 +1,8 @@
 import { Sequelize, DataTypes } from 'sequelize';
 import { sequelize } from '../database/db.js';
 
-export class Trip extends Sequelize.Model {}
-Trip.init({
+export class Flight extends Sequelize.Model {}
+Flight.init({
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -29,5 +29,5 @@ Trip.init({
   }
 }, {
   sequelize,
-  modelName: 'Trip'
+  modelName: 'Flight'
 });

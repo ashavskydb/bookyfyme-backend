@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
 import router from './src/routes/users.js'; 
@@ -8,7 +9,7 @@ import accomRoutes from './src/routes/accomRoutes.js';
 import bandsintownRoutes from './src/routes/bandsintownRoutes.js';
 import config from './src/config/config.js';
 import { User } from './src/models/User.js';
-import { bookFlightAndCreateTrip } from './src/services/Flights/googleFlights.js';
+import { searchFlights, bookFlightAndCreateTrip, fetchFlightData } from './src/services/Flights/googleFlights.js';
 import { searchAccommodations } from './src/services/Accommodations/googleHotels.js';
 import { parseEvent } from './src/services/Afisha/bandsintown.js';
 
@@ -25,12 +26,31 @@ if (missingEnvVars.length > 0) {
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+app.use(cors({
+    origin: 'http://localhost:3000', 
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+app.use(cors()); 
 app.use(express.json());
-app.use('/api/auth', router); 
+app.use('/api/auth', router);
 app.use('/api/events', eventRoutes);
 app.use('/api/trips', tripRoutes);
 app.use('/api/accommodations', accomRoutes);
 app.use('/api/bandsintown', bandsintownRoutes);
+
+
+app.post('/api/flights/search', async (req, res) => {
+    try {
+        const { origin, destination, departureDate, returnDate } = req.body;
+        const flights = await searchFlights(origin, destination, departureDate, returnDate);
+        res.status(200).json(flights);
+    } catch (error) {
+        console.error('Error during flight search:', error);
+        res.status(500).json({ error: 'Internal server error during flight search' });
+    }
+});
 
 const sequelize = new Sequelize(config.database, config.username, config.password, {
     host: config.host,

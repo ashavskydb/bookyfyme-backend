@@ -1,4 +1,4 @@
-import { Trip } from '../models/Flight.js';
+import { Flight } from '../models/Flight.js';
 
 export const getTrips = async (req, res) => {
   try {
