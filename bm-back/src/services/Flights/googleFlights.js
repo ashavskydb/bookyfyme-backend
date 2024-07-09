@@ -4,18 +4,23 @@ import { Flight } from '../../models/Flight.js';
 const API_KEY = "c2ff5dcfd254658cd22d35f43e06fa89a42a7396ce96588aaab08c60f01cc82f";
 
 async function searchFlights(origin, destination, departureDate, returnDate) {
-  const response = await axios.get('https://serpapi.com/search', {
-    params: {
-      engine: 'google_flights',
-      departure_id: origin,
-      arrival_id: destination,
-      outbound_date: departureDate,
-      return_date: returnDate,
-      api_key: API_KEY
-    }
-  });
-
-  return response.data.best_flights || response.data.other_flights;
+  try {
+    const response = await axios.get('https://serpapi.com/search', {
+      params: {
+        engine: 'google_flights',
+        departure_id: origin,
+        arrival_id: destination,
+        outbound_date: departureDate,
+        return_date: returnDate,
+        api_key: API_KEY
+      }
+    });
+    console.log('Search Flights Response:', response.data); 
+    return response.data.best_flights || response.data.other_flights;
+  } catch (error) {
+    console.error('Error in searchFlights:', error); 
+    throw error;
+  }
 }
 
 async function fetchFlightData() {

@@ -1,10 +1,13 @@
 import { Event } from '../models/Event.js';
 
 export const getEvents = async (req, res) => {
+  console.log('getEvent req===>');
+  console.log('getEvent res===>');
   try {
     const events = await Event.findAll({ where: { userId: req.user.id } });
     res.json(events);
   } catch (error) {
+    console.error('Error fetching events:', error); // error logging
     res.status(500).json({ error: error.message || 'Internal server error' });
   }
 };
@@ -19,6 +22,7 @@ export const createEvent = async (req, res) => {
     const event = await Event.create({ title, description, eventDate, userId: req.user.id });
     res.status(201).json(event);
   } catch (error) {
+    console.error('Error creating event:', error); // error logging
     res.status(500).json({ error: 'Internal server error' });
   }
 };

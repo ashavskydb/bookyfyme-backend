@@ -32,7 +32,6 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.use(cors()); 
 app.use(express.json());
 app.use('/api/auth', router);
 app.use('/api/events', eventRoutes);
@@ -40,14 +39,17 @@ app.use('/api/trips', tripRoutes);
 app.use('/api/accommodations', accomRoutes);
 app.use('/api/bandsintown', bandsintownRoutes);
 
+const calendars = [];
 
 app.post('/api/flights/search', async (req, res) => {
     try {
         const { origin, destination, departureDate, returnDate } = req.body;
+        console.log('Flight search parameters:', { origin, destination, departureDate, returnDate });
         const flights = await searchFlights(origin, destination, departureDate, returnDate);
+        console.log('Flights found:', flights);
         res.status(200).json(flights);
     } catch (error) {
-        console.error('Error during flight search:', error);
+        console.error('Error during flight search:', error); 
         res.status(500).json({ error: 'Internal server error during flight search' });
     }
 });
@@ -75,6 +77,7 @@ app.post('/api/create-calendar', (req, res) => {
         calendars.push(newCalendar);
         res.status(201).json(newCalendar);
     } catch (error) {
+        console.error('Error creating calendar:', error);
         res.status(500).json({ error: 'Internal server error. Please try again later.' });
     }
 });
@@ -83,6 +86,7 @@ app.get('/api/calendars', (req, res) => {
     try {
         res.status(200).json(calendars);
     } catch (error) {
+        console.error('Error fetching calendars:', error);
         res.status(500).json({ error: 'Internal server error. Please try again later.' });
     }
 });
@@ -92,6 +96,7 @@ app.post('/api/book-flight', async (req, res) => {
         const result = await bookFlightAndCreateTrip(req.body);
         res.status(201).json(result);
     } catch (error) {
+        console.error('Error booking flight:', error);
         res.status(500).json({ error: 'Internal server error. Please try again later.' });
     }
 });
@@ -115,6 +120,7 @@ app.post('/api/book-accommodation-and-find-events', async (req, res) => {
 
         res.status(201).json({ accommodations, calendarEvent });
     } catch (error) {
+        console.error('Error booking accommodation and finding events:', error);
         res.status(500).json({ error: 'Internal server error. Please try again later.' });
     }
 });
@@ -124,6 +130,7 @@ app.post('/api/test-user', async (req, res) => {
         const testUser = await User.create({ email: 'test@example.com', password: 'password' });
         res.status(201).json(testUser);
     } catch (error) {
+        console.error('Error creating test user:', error);
         res.status(500).json({ error: 'Internal server error. Please try again later.' });
     }
 });
@@ -134,6 +141,7 @@ app.post('/api/bandsintown/parse-events', async (req, res) => {
         await parseEvent(artist, region);
         res.status(200).json({ message: 'Events parsed and saved successfully.' });
     } catch (error) {
+        console.error('Error parsing events:', error);
         res.status(500).json({ error: 'Internal server error. Please try again later.' });
     }
 });
