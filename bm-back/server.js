@@ -12,6 +12,7 @@ import { User } from './src/models/User.js';
 import { searchFlights, bookFlightAndCreateTrip, fetchFlightData } from './src/services/Flights/googleFlights.js';
 import { searchAccommodations } from './src/services/Accommodations/googleHotels.js';
 import { parseEvent } from './src/services/Afisha/bandsintown.js';
+import accomRoutes from './src/routes/accomRoutes.js';
 
 dotenv.config();
 
@@ -38,6 +39,7 @@ app.use('/api/events', eventRoutes);
 app.use('/api/trips', tripRoutes);
 app.use('/api/accommodations', accomRoutes);
 app.use('/api/bandsintown', bandsintownRoutes);
+app.use('/api/accommodations', accomRoutes);
 
 const calendars = [];
 
@@ -120,7 +122,7 @@ app.post('/api/book-accommodation-and-find-events', async (req, res) => {
 
         res.status(201).json({ accommodations, calendarEvent });
     } catch (error) {
-        console.error('Error booking accommodation and finding events:', error);
+        console.error('Error booking accommodation and finding events:', error.message);
         res.status(500).json({ error: 'Internal server error. Please try again later.' });
     }
 });

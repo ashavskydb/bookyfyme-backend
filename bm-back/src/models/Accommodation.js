@@ -1,7 +1,6 @@
 import { Sequelize, DataTypes } from 'sequelize';
 import { sequelize } from '../database/db.js';
 
-
 export class Accommodation extends Sequelize.Model {}
 Accommodation.init({
   id: {
