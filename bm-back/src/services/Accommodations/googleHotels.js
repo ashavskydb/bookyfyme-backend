@@ -13,7 +13,7 @@ async function searchAccommodations(city, checkInDate, checkOutDate) {
     const response = await axios.get(GOOGLE_HOTELS_API_URL, {
       params: {
         engine: 'google_hotels',
-        q: city,
+        q: `${city} hotels`,
         check_in_date: checkInDate,
         check_out_date: checkOutDate,
         api_key: API_KEY
@@ -21,7 +21,10 @@ async function searchAccommodations(city, checkInDate, checkOutDate) {
     });
 
     console.log('Search Accommodations Response:', response.data);
-    return response.data.properties;
+    if (response.data.search_metadata.status !== 'Success') {
+      throw new Error(`Search failed: ${response.data.search_metadata.error}`);
+    }
+    return response.data.hotels_results; 
   } catch (error) {
     console.error('Error fetching accommodations:', error.message);
     throw error;
@@ -41,7 +44,7 @@ async function fetchAccommodationData(city, checkInDate, checkOutDate) {
 
     const accommodation = accommodations[0];
     return {
-      city: accommodation.city,
+      city: accommodation.address.city,
       checkInDate: new Date(checkInDate),
       checkOutDate: new Date(checkOutDate),
       name: accommodation.name
@@ -57,7 +60,7 @@ async function bookAccommodationAndCreateTrip() {
     const accommodationData = await fetchAccommodationData('Paris', '2024-12-02', '2024-12-05');
     
     const accommodation = await Accommodation.create({
-      userId: 1, // Ensure you have the correct userId
+      userId: 1, 
       city: accommodationData.city,
       startDate: accommodationData.checkInDate,
       endDate: accommodationData.checkOutDate,

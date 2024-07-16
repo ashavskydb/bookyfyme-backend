@@ -12,7 +12,6 @@ import { User } from './src/models/User.js';
 import { searchFlights, bookFlightAndCreateTrip, fetchFlightData } from './src/services/Flights/googleFlights.js';
 import { searchAccommodations } from './src/services/Accommodations/googleHotels.js';
 import { parseEvent } from './src/services/Afisha/bandsintown.js';
-import accomRoutes from './src/routes/accomRoutes.js';
 
 dotenv.config();
 

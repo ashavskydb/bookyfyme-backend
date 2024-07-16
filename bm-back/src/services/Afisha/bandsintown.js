@@ -1,14 +1,26 @@
 import axios from 'axios';
 import readline from 'readline';
-import { Bandsintown } from '../../models/Bandsintown.js';
+// import { Bandsintown } from '../../models/Bandsintown.js';
 import { sequelize } from '../../database/db.js';    
+
+const apiUrl = 'http://localhost:5000/api/bandsintown';
 
 async function httpGetAsync(url) {
     try {
         const response = await axios.get(url);
         return response.data;
     } catch (error) {
-        console.error('Error fetching data from API:', error);
+        console.error('Error fetching data from API:', error.response ? error.response.data : error.message);
+        return null;
+    }
+}
+
+async function createEventOnServer(eventData) {
+    try {
+        const response = await axios.post(`${apiUrl}/`, eventData);
+        return response.data;
+    } catch (error) {
+        console.error('Error creating event on server:', error.response ? error.response.data : error.message);
         return null;
     }
 }
@@ -21,20 +33,28 @@ async function parseEvent(artist, region) {
         console.log(`${numEvents} events found for ${artist}`);
         for (let j = 0; j < numEvents; j++) {
             if (data[j].venue.region === region) {
-                console.log(`Venue: ${data[j].venue.name}`);
-                console.log(`LAT: ${data[j].venue.latitude} LNG: ${data[j].venue.longitude}`);
-                console.log(`ARTIST: ${data[j].artists[0].name}`);
-                console.log(`DATE: ${data[j].datetime}`);
-                console.log(`Region: ${data[j].venue.region}`);
-                console.log(`Event ${j}`);
-                console.log('---');
+                const event = data[j];
+                const eventArtist = event.artists && event.artists[0];
+                if (eventArtist) {
+                    console.log(`Venue: ${event.venue.name}`);
+                    console.log(`LAT: ${event.venue.latitude} LNG: ${event.venue.longitude}`);
+                    console.log(`ARTIST: ${eventArtist.name}`);
+                    console.log(`DATE: ${event.datetime}`);
+                    console.log(`Region: ${event.venue.region}`);
+                    console.log(`Event ${j}`);
+                    console.log('---');
 
-                await Bandsintown.create({
-                    name: data[j].artists[0].name,
-                    city: data[j].venue.city,
-                    date: data[j].datetime.split('T')[0], 
-                    details: `Venue: ${data[j].venue.name}, LAT: ${data[j].venue.latitude}, LNG: ${data[j].venue.longitude}`
-                });
+                    const eventData = {
+                        name: eventArtist.name,
+                        city: event.venue.city,
+                        date: event.datetime.split('T')[0], 
+                        details: `Venue: ${event.venue.name}, LAT: ${event.venue.latitude}, LNG: ${event.venue.longitude}`
+                    };
+
+                    await createEventOnServer(eventData);
+                } else {
+                    console.warn(`No artists found for event ${j}`);
+                }
             }
         }
     }
