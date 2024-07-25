@@ -5,7 +5,7 @@ const router = Router();
 
 router.post('/register', async (req, res) => {
   try {
-    await registerUser(req, res);
+    await registerUser[1](req, res);
   } catch (error) {
     console.error('Error during registration:', error);
     res.status(500).json({ error: 'Internal server error during registration' });
@@ -14,7 +14,7 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   try {
-    await loginUser(req, res);
+    await loginUser[1](req, res);
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).json({ error: 'Internal server error during login' });

@@ -7,6 +7,7 @@ import eventRoutes from './src/routes/eventRoutes.js';
 import tripRoutes from './src/routes/flightRoutes.js';
 import accomRoutes from './src/routes/accomRoutes.js';
 import bandsintownRoutes from './src/routes/bandsintownRoutes.js';
+import verifyToken from './src/middleware/verifyToken.js';
 import config from './src/config/config.js';
 import { User } from './src/models/User.js';
 import { searchFlights, bookFlightAndCreateTrip, fetchFlightData } from './src/services/Flights/googleFlights.js';
@@ -36,9 +37,9 @@ app.use(express.json());
 app.use('/api/auth', router);
 app.use('/api/events', eventRoutes);
 app.use('/api/trips', tripRoutes);
+app.use('/api/accommodations', verifyToken, accomRoutes);
 app.use('/api/accommodations', accomRoutes);
 app.use('/api/bandsintown', bandsintownRoutes);
-app.use('/api/accommodations', accomRoutes);
 
 const calendars = [];
 
@@ -83,7 +84,7 @@ app.post('/api/create-calendar', (req, res) => {
     }
 });
 
-app.get('/api/calendars', (req, res) => {
+app.get('/api/calendars' , verifyToken, (req, res) => {
     try {
         res.status(200).json(calendars);
     } catch (error) {
@@ -92,7 +93,7 @@ app.get('/api/calendars', (req, res) => {
     }
 });
 
-app.post('/api/book-flight', async (req, res) => {
+app.post('/api/book-flight' , verifyToken, async (req, res) => {
     try {
         const result = await bookFlightAndCreateTrip(req.body);
         res.status(201).json(result);
@@ -102,7 +103,7 @@ app.post('/api/book-flight', async (req, res) => {
     }
 });
 
-app.post('/api/book-accommodation-and-find-events', async (req, res) => {
+app.post('/api/book-accommodation-and-find-events', verifyToken, async (req, res) => {
     try {
         const { city, startDate, endDate } = req.body;
         const accommodations = await searchAccommodations(city, startDate, endDate);

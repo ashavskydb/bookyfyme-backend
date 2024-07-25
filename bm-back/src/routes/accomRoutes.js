@@ -6,6 +6,7 @@ const router = express.Router();
 
 const authenticateToken = (req, res, next) => {
   const token = req.header('Authorization')?.split(' ')[1];
+  console.log('Authorization header:', req.header('Authorization'));
   if (!token) {
     return res.status(401).json({ error: 'Access denied, no token provided' });
   }
@@ -14,6 +15,7 @@ const authenticateToken = (req, res, next) => {
     req.user = verified;
     next();
   } catch (error) {
+    console.error('Token verification error:', error);
     res.status(400).json({ error: 'Invalid token' });
   }
 };

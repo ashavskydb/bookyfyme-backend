@@ -1,23 +1,33 @@
-import express from 'express';
+// import express from 'express';
 import jwt from 'jsonwebtoken';
 import { config } from '../config/config.js';
 
-const app = express();
+// const app = express();
 
 const verifyToken = (req, res, next) => {
-  const bearerHeader = req.headers['authorization'];
-  if (!bearerHeader) {
-    return res.status(401).json({ message: 'No token, authorization denied' });
+  const token = req.header('Authorization')?.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ error: 'Access denied, no token provided' });
   }
-
-  const token = bearerHeader.split(' ')[1]; 
   try {
-    const decoded = jwt.verify(token, config.jwtSecret);
-    req.user = decoded;
+    const verified = jwt.verify(token, config.jwtSecret);
+    req.user = verified;
     next();
-  } catch (err) {
-    res.status(401).json({ message: 'Token is not valid' });
+  } catch (error) {
+    console.error('Token verification error:', error);
+    res.status(400).json({ error: 'Invalid token' });
   }
 };
 
 export default verifyToken;
+
+
+
+
+
+
+
+
+
+
+
