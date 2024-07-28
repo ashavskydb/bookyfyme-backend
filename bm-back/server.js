@@ -10,7 +10,7 @@ import bandsintownRoutes from './src/routes/bandsintownRoutes.js';
 import verifyToken from './src/middleware/verifyToken.js';
 import config from './src/config/config.js';
 import { User } from './src/models/User.js';
-import { searchFlights, bookFlightAndCreateTrip, fetchFlightData } from './src/services/Flights/googleFlights.js';
+import { searchFlights, bookFlightAndCreateTrip } from './src/services/Flights/googleFlights.js';
 import { searchAccommodations } from './src/services/Accommodations/googleHotels.js';
 import { parseEvent } from './src/services/Afisha/bandsintown.js';
 
@@ -139,9 +139,17 @@ app.post('/api/test-user', async (req, res) => {
 
 app.post('/api/bandsintown/parse-events', async (req, res) => {
     try {
-        const { artist, region } = req.body;
-        await parseEvent(artist, region);
-        res.status(200).json({ message: 'Events parsed and saved successfully.' });
+        const { city, date, region } = req.body;
+        const events = [];
+
+        for (let artist of artists) {
+            const parsedEvents = await parseEvent(artist, region);
+            events.push(...parsedEvents.filter(event => 
+                event.city.toLowerCase() === city.toLowerCase() && 
+                new Date(event.date).toDateString() === new Date(date).toDateString()));
+        }
+
+        res.status(200).json(events);
     } catch (error) {
         console.error('Error parsing events:', error);
         res.status(500).json({ error: 'Internal server error. Please try again later.' });

@@ -1,7 +1,6 @@
 import axios from 'axios';
-import readline from 'readline';
-// import { Bandsintown } from '../../models/Bandsintown.js';
-import { sequelize } from '../../database/db.js';    
+import { Bandsintown } from '../../models/Bandsintown.js';
+import { sequelize } from '../../database/db.js';
 
 const apiUrl = 'http://localhost:5000/api/bandsintown';
 
@@ -25,9 +24,21 @@ async function createEventOnServer(eventData) {
     }
 }
 
+async function saveEventToDatabase(eventData) {
+    try {
+        const event = await Bandsintown.create(eventData);
+        return event;
+    } catch (error) {
+        console.error('Error saving event to database:', error);
+        return null;
+    }
+}
+
 async function parseEvent(artist, region) {
     const url = `https://rest.bandsintown.com/artists/${artist}/events?app_id=9c42d4dc9c1397201a4e3dc4d0bb840c&venue.region=${region}`;
     const data = await httpGetAsync(url);
+    const events = [];
+    
     if (data) {
         const numEvents = data.length;
         console.log(`${numEvents} events found for ${artist}`);
@@ -47,17 +58,21 @@ async function parseEvent(artist, region) {
                     const eventData = {
                         name: eventArtist.name,
                         city: event.venue.city,
-                        date: event.datetime.split('T')[0], 
+                        date: event.datetime.split('T')[0],
                         details: `Venue: ${event.venue.name}, LAT: ${event.venue.latitude}, LNG: ${event.venue.longitude}`
                     };
 
+                    events.push(eventData);
+
                     await createEventOnServer(eventData);
+                    await saveEventToDatabase(eventData);
                 } else {
                     console.warn(`No artists found for event ${j}`);
                 }
             }
         }
     }
+    return events;
 }
 
 const artists = [
@@ -80,60 +95,17 @@ const artists = [
     "Sum 41", "Yellowcard", "3 Doors Down", "30 Seconds to Mars", "AFI", "All Time Low"
 ];
 
-const regions = [
-    { name: 'California', code: 'CA' },
-    { name: 'New York', code: 'NY' },
-    { name: 'Texas', code: 'TX' },
-    { name: 'Florida', code: 'FL' },
-    { name: 'Illinois', code: 'IL' },
-    { name: 'Pennsylvania', code: 'PA' },
-    { name: 'Ohio', code: 'OH' },
-    { name: 'Georgia', code: 'GA' },
-    { name: 'North Carolina', code: 'NC' },
-    { name: 'Michigan', code: 'MI' },
-    { name: 'Moscow', code: 'MOW' },
-    { name: 'Saint Petersburg', code: 'SPE' },
-    { name: 'London', code: 'LND' },
-    { name: 'Berlin', code: 'BER' },
-    { name: 'Paris', code: 'PAR' },
-    { name: 'Tokyo', code: 'TOK' },
-    { name: 'Sydney', code: 'SYD' },
-    { name: 'Toronto', code: 'TOR' }
-];
+export async function fetchEvents(region) {
+    await sequelize.sync();
+    const allEvents = [];
 
-function promptUserForRegion() {
-    console.log('Please select a region:');
-    regions.forEach((region, index) => {
-        console.log(`${index + 1}. ${region.name}`);
-    });
-
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    });
-
-    rl.question('Enter the number of your choice: ', (answer) => {
-        const regionIndex = parseInt(answer) - 1;
-        if (regionIndex >= 0 && regionIndex < regions.length) {
-            const selectedRegion = regions[regionIndex].code;
-            rl.close();
-            startFetchingEvents(selectedRegion);
-        } else {
-            console.error('Invalid choice. Please try again.');
-            rl.close();
-            promptUserForRegion();
-        }
-    });
-}
-
-async function startFetchingEvents(region) {
-    await sequelize.sync(); 
     for (let artist of artists) {
-        await parseEvent(artist, region);
+        const events = await parseEvent(artist, region);
+        allEvents.push(...events);
         console.log('---NEXT ARTIST---');
     }
-}
 
-promptUserForRegion(); 
+    return allEvents;
+}
 
 export { parseEvent };
