@@ -139,11 +139,11 @@ app.post('/api/test-user', async (req, res) => {
 
 app.post('/api/bandsintown/parse-events', async (req, res) => {
     try {
-        const { city, date, region } = req.body;
+        const { city, date } = req.body;
         const events = [];
 
         for (let artist of artists) {
-            const parsedEvents = await parseEvent(artist, region);
+            const parsedEvents = await parseEvent(artist, city);
             events.push(...parsedEvents.filter(event => 
                 event.city.toLowerCase() === city.toLowerCase() && 
                 new Date(event.date).toDateString() === new Date(date).toDateString()));
