@@ -33,6 +33,12 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+app.options('*', cors({
+    origin: 'https://bookyfyme-frontend.onrender.com',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 app.use('/api/auth', router);
 app.use('/api/events', eventRoutes);
