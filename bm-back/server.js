@@ -30,24 +30,29 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({
     origin: 'https://bookyfyme-frontend.onrender.com', 
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-app.options('*', cors({
-    origin: 'https://bookyfyme-frontend.onrender.com',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
 }));
 
 app.use(express.json());
+
 app.use('/api/auth', router);
 app.use('/api/events', eventRoutes);
 app.use('/api/trips', tripRoutes);
 app.use('/api/accommodations', verifyToken, accomRoutes);
-app.use('/api/accommodations', accomRoutes);
 app.use('/api/bandsintown', bandsintownRoutes);
 
-const calendars = [];
+const sequelize = new Sequelize(config.database, config.username, config.password, {
+    host: config.host,
+    dialect: 'postgres', 
+    dialectOptions: {
+        ssl: {
+            require: config.useSSL,
+            rejectUnauthorized: config.rejectUnauthorized
+        }
+    },
+    logging: config.logging
+});
 
 app.post('/api/flights/search', async (req, res) => {
     try {
@@ -62,17 +67,7 @@ app.post('/api/flights/search', async (req, res) => {
     }
 });
 
-const sequelize = new Sequelize(config.database, config.username, config.password, {
-    host: config.host,
-    dialect: 'postgres', 
-    dialectOptions: {
-        ssl: {
-            require: config.useSSL,
-            rejectUnauthorized: config.rejectUnauthorized
-        }
-    },
-    logging: config.logging
-});
+const calendars = [];
 
 app.post('/api/create-calendar', (req, res) => {
     try {
@@ -90,7 +85,7 @@ app.post('/api/create-calendar', (req, res) => {
     }
 });
 
-app.get('/api/calendars' , verifyToken, (req, res) => {
+app.get('/api/calendars', verifyToken, (req, res) => {
     try {
         res.status(200).json(calendars);
     } catch (error) {
@@ -99,7 +94,7 @@ app.get('/api/calendars' , verifyToken, (req, res) => {
     }
 });
 
-app.post('/api/book-flight' , verifyToken, async (req, res) => {
+app.post('/api/book-flight', verifyToken, async (req, res) => {
     try {
         const result = await bookFlightAndCreateTrip(req.body);
         res.status(201).json(result);
@@ -108,6 +103,7 @@ app.post('/api/book-flight' , verifyToken, async (req, res) => {
         res.status(500).json({ error: 'Internal server error. Please try again later.' });
     }
 });
+
 
 app.post('/api/book-accommodation-and-find-events', verifyToken, async (req, res) => {
     try {
@@ -133,6 +129,7 @@ app.post('/api/book-accommodation-and-find-events', verifyToken, async (req, res
     }
 });
 
+
 app.post('/api/test-user', async (req, res) => {
     try {
         const testUser = await User.create({ email: 'test@example.com', password: 'password' });
@@ -142,6 +139,7 @@ app.post('/api/test-user', async (req, res) => {
         res.status(500).json({ error: 'Internal server error. Please try again later.' });
     }
 });
+
 
 app.post('/api/bandsintown/parse-events', async (req, res) => {
     try {
