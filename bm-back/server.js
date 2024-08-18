@@ -144,9 +144,17 @@ app.post('/api/test-user', async (req, res) => {
 app.post('/api/bandsintown/parse-events', async (req, res) => {
     try {
         const { city, date } = req.body;
+        
+        if (!city || !date) {
+            return res.status(400).json({ error: 'City and date are required' });
+        }
+
+        console.log('Received city:', city);
+        console.log('Received date:', date);
+
         const events = [];
 
-        for (let artist of artists) {
+        for (let artist of artists) { 
             const parsedEvents = await parseEvent(artist, city);
             events.push(...parsedEvents.filter(event => 
                 event.city.toLowerCase() === city.toLowerCase() && 
