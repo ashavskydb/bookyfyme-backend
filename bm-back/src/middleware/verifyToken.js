@@ -1,8 +1,5 @@
-// import express from 'express';
 import jwt from 'jsonwebtoken';
 import { config } from '../config/config.js';
-
-// const app = express();
 
 const verifyToken = (req, res, next) => {
   const token = req.header('Authorization')?.split(' ')[1];
@@ -20,7 +17,6 @@ const verifyToken = (req, res, next) => {
 };
 
 export default verifyToken;
-
 
 
 
