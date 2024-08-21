@@ -2,30 +2,27 @@ import axios from 'axios';
 import { Accommodation } from '../../models/Accommodation.js';
 
 const API_KEY = 'c2ff5dcfd254658cd22d35f43e06fa89a42a7396ce96588aaab08c60f01cc82f'; 
-// const GOOGLE_HOTELS_API_URL = 'https://serpapi.com/search';
 
-async function searchAccommodations(city, checkInDate, checkOutDate) {
+export const searchAccommodations = async (city, checkInDate, checkOutDate) => {
   try {
-    if (!city) {
-      throw new Error('City parameter is required');
-    }
     const response = await axios.get('https://serpapi.com/search', {
       params: {
-        engine: 'google_hotels',
+        engine: "google_hotels",
         q: `${city} hotels`,
         check_in_date: checkInDate,
         check_out_date: checkOutDate,
+        adults: "2",
+        currency: "USD",
+        gl: "us",
+        hl: "en",
         api_key: API_KEY
       }
     });
 
     console.log('Search Accommodations Response:', response.data);
-    if (response.data.search_metadata.status !== 'Success') {
-      throw new Error(`Search failed: ${response.data.search_metadata.error}`);
-    }
-    return response.data.hotels_results; 
+    return response.data.best_hotels || response.data.other_hotels;
   } catch (error) {
-    console.error('Error fetching accommodations:', error.message);
+    console.error('Error in searchAccommodations:', error); 
     throw error;
   }
 }
@@ -59,7 +56,7 @@ async function bookAccommodationAndCreateTrip() {
     const accommodationData = await fetchAccommodationData('Paris', '2024-12-02', '2024-12-05');
     
     const accommodation = await Accommodation.create({
-      userId: 1, 
+      userId: 1,
       city: accommodationData.city,
       startDate: accommodationData.checkInDate,
       endDate: accommodationData.checkOutDate,
