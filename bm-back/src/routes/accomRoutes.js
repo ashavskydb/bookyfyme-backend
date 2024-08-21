@@ -20,7 +20,9 @@ const authenticateToken = (req, res, next) => {
   }
 };
 
-router.get('/', authenticateToken, accomController.findAccommodations);
-router.post('/', authenticateToken, accomController.createAccommodation);
+router.get('/', accomController.findAccommodations);
+router.post('/', accomController.createAccommodation);
+router.post('/search', accomController.findAccommodations);
+
 
 export default router;
