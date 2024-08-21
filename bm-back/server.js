@@ -196,5 +196,3 @@ async function startServer() {
 }
 
 startServer();
-
-export { parseEvent };
