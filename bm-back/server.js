@@ -11,7 +11,7 @@ import verifyToken from './src/middleware/verifyToken.js';
 import config from './src/config/config.js';
 import { User } from './src/models/User.js';
 import { searchFlights, bookFlightAndCreateTrip } from './src/services/Flights/googleFlights.js';
-import { search_Accommodations, bookAccommodationAndCreateTrip } from './src/services/Accommodations/googleHotels.js';
+import { searchAccommodations, bookAccommodationAndCreateTrip } from './src/services/Accommodations/googleHotels.js';
 import { parseEvent } from './src/services/Afisha/bandsintown.js';
 
 dotenv.config();
@@ -108,7 +108,7 @@ app.post('/api/book-flight', verifyToken, async (req, res) => {
 app.post('/api/book-accommodation-and-find-events', async (req, res) => {
     try {
         const { city, startDate, endDate } = req.body;
-        const accommodations = await search_Accommodations(city, startDate, endDate);
+        const accommodations = await searchAccommodations(city, startDate, endDate);
 
         const calendarEvent = {
             event_id: 'accommodation-' + new Date().getTime(),
