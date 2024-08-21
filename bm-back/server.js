@@ -11,7 +11,7 @@ import verifyToken from './src/middleware/verifyToken.js';
 import config from './src/config/config.js';
 import { User } from './src/models/User.js';
 import { searchFlights, bookFlightAndCreateTrip } from './src/services/Flights/googleFlights.js';
-import { searchAccommodations } from './src/services/Accommodations/googleHotels.js';
+import { searchAccommodations, bookAccommodationAndCreateTrip } from './src/services/Accommodations/googleHotels.js';
 import { parseEvent } from './src/services/Afisha/bandsintown.js';
 
 dotenv.config();
@@ -25,10 +25,10 @@ if (missingEnvVars.length > 0) {
 }
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 app.use(cors({
-    origin: 'https://bookyfyme-frontend.onrender.com', 
+    origin: ['https://bookyfyme-frontend.onrender.com','http://localhost:3000'], 
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
@@ -39,7 +39,7 @@ app.use(express.json());
 app.use('/api/auth', router);
 app.use('/api/events', eventRoutes);
 app.use('/api/trips', tripRoutes);
-app.use('/api/accommodations', verifyToken, accomRoutes);
+app.use('/api/accommodations', accomRoutes);
 app.use('/api/bandsintown', bandsintownRoutes);
 
 const sequelize = new Sequelize(config.database, config.username, config.password, {
@@ -105,7 +105,7 @@ app.post('/api/book-flight', verifyToken, async (req, res) => {
 });
 
 
-app.post('/api/book-accommodation-and-find-events', verifyToken, async (req, res) => {
+app.post('/api/book-accommodation-and-find-events', async (req, res) => {
     try {
         const { city, startDate, endDate } = req.body;
         const accommodations = await searchAccommodations(city, startDate, endDate);
@@ -129,6 +129,15 @@ app.post('/api/book-accommodation-and-find-events', verifyToken, async (req, res
     }
 });
 
+app.post('/api/book-accommodation', verifyToken, async (req, res) => {
+    try {
+        const result = await bookAccommodationAndCreateTrip(req.body);
+        res.status(201).json(result);
+    } catch (error) {
+        console.error('Error booking accommodation:', error);
+        res.status(500).json({ error: 'Internal server error. Please try again later.' });
+    }
+});
 
 app.post('/api/test-user', async (req, res) => {
     try {
@@ -173,6 +182,8 @@ async function startServer() {
         await sequelize.authenticate();
         console.log('Connection to the database has been established successfully.');
 
+        await sequelize.sync();
+
         const [result] = await sequelize.query('SELECT version();');
         console.log('PostgreSQL version:', result[0].version);
 
@@ -185,3 +196,5 @@ async function startServer() {
 }
 
 startServer();
+
+export { parseEvent };
