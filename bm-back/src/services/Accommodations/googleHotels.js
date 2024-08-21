@@ -3,7 +3,7 @@ import { Accommodation } from '../../models/Accommodation.js';
 
 const API_KEY = 'c2ff5dcfd254658cd22d35f43e06fa89a42a7396ce96588aaab08c60f01cc82f'; 
 
-export const search_Accommodations = async (city, checkInDate, checkOutDate) => {
+const search_Accommodations = async (city, checkInDate, checkOutDate) => {
   try {
     const response = await axios.get('https://serpapi.com/search', {
       params: {
